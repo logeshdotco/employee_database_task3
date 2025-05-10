@@ -445,10 +445,10 @@
             };
             
             // Send to backend
-            fetch('/api/register', {
+            fetch('/script', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'package/json',
                 },
                 body: JSON.stringify(employee)
             })
@@ -494,10 +494,10 @@
             };
             
             // Send to backend
-            fetch('/api/verify', {
+            fetch('/script', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'package/json',
                 },
                 body: JSON.stringify(loginData)
             })
