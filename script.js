@@ -15,12 +15,15 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Middleware
 app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public',)));
 
-// Serve static files (make sure HTML is in the public folder)
-app.use(express.static(path.join(__dirname, 'public')));
+// Routes
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
-// API Routes
+// API endpoint for employee registration
 app.post('/api/register', async (req, res) => {
   try {
     const { id, Emp_name, salary, PF, DATE_OF_JOINING, MOBILE_NO, password } = req.body;
@@ -77,6 +80,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+// API endpoint for employee verification
 app.post('/api/verify', async (req, res) => {
   try {
     const { id, password } = req.body;
@@ -117,12 +121,6 @@ app.post('/api/verify', async (req, res) => {
       error: error.message
     });
   }
-});
-
-// Important: This route should come AFTER API routes
-// This serves the index.html for any routes not matching API routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start server
