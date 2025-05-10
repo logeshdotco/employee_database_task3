@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Database</title>
+    <style>
+        :root {
+            --royal-purple: #7851a9;
+            --royal-blue: #4169e1;
+            --royal-purple-light: #9d77c9;
+            --royal-blue-light: #6a8be8;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-gray);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--royal-purple), var(--royal-blue));
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .main-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 500px;
+            margin: 3rem auto;
+        }
+
+        .main-btn {
+            background: linear-gradient(135deg, var(--royal-purple), var(--royal-blue));
+            color: var(--white);
+            border: none;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .main-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card h2 {
+            color: var(--royal-purple);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--royal-purple), var(--royal-blue));
+            color: var(--white);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            display: inline-block;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, var(--royal-purple-light), var(--royal-blue-light));
+        }
+
+        .btn-secondary {
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e5e5;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .text-center { 
+            text-align: center; 
+        }
+
+        .section {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        #employeeDetails {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            width: 40%;
+            color: var(--royal-purple);
+        }
+
+        .detail-value {
+            width: 60%;
+        }
+
+        .error-message {
+            color: #d9534f;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .success-message {
+            color: #5cb85c;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            margin: 15% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">Employee Database</div>
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="showSection('home')">Home</button>
+            <button class="nav-btn" onclick="showModal('aboutModal')">About</button>
+            <button class="nav-btn" onclick="showModal('contactModal')">Contact</button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Home Section -->
+        <div id="home" class="section active">
+            <div class="main-buttons">
+                <button class="main-btn" onclick="showSection('registration')">New Employee Registration</button>
+                <button class="main-btn" onclick="showSection('verification')">Employee Verification</button>
+            </div>
+        </div>
+
+        <!-- Registration Section -->
+        <div id="registration" class="section">
+            <div class="card">
+                <h2>New Employee Registration</h2>
+                <form id="registrationForm">
+                    <div class="form-group">
+                        <label for="empId">Employee ID</label>
+                        <input type="text" placeholder="Enter Employee ID"class="form-control" id="empId" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="empName">Employee Name</label>
+                        <input type="text"placeholder="Enter Employee Name" class="form-control" id="empName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="salary">Salary</label>
+                        <input type="number" placeholder="Enter Employee's correct salary(don't play with employees life)" class="form-control" id="salary" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pf">PF</label>
+                        <input type="number" placeholder="Enter PF" class="form-control" id="pf" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="doj">Date of Joining</label>
+                        <input type="date"placeholder="Enter Date of join when the employee joins" class="form-control" id="doj" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">Mobile Number</label>
+                        <input type="tel"placeholder="Enter Employee's Contact number" class="form-control" id="mobile" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" placeholder="Enter password" class="form-control" id="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" placeholder="Enter password again to verify" class="form-control" id="confirmPassword" required>
+                    </div>
+                    <div id="registrationMessage"></div>
+                    <div class="buttons-container">
+                        <button type="button" class="btn btn-secondary" onclick="showSection('home')">Back</button>
+                        <button type="submit" class="btn btn-block">Register</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Verification Section -->
+        <div id="verification" class="section">
+            <div class="card">
+                <h2>Employee Verification</h2>
+                <form id="verificationForm">
+                    <div class="form-group">
+                        <label for="loginId">Employee ID</label>
+                        <input type="text" placeholder="Enter Employee ID"class="form-control" id="loginId" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" placeholder="Enter password"class="form-control" id="loginPassword" required>
+                    </div>
+                    <div id="loginMessage"></div>
+                    <div class="buttons-container">
+                        <button type="button" class="btn btn-secondary" onclick="showSection('home')">Back</button>
+                        <button type="submit" class="btn btn-block">Verify</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Employee Details Section -->
+        <div id="employeeDetailsSection" class="section">
+            <div class="card">
+                <h2>Employee Details</h2>
+                <div id="employeeDetails"></div>
+                <div class="buttons-container">
+                    <button type="button" class="btn btn-secondary" onclick="showSection('verification')">Back</button>
+                    <button type="button" class="btn" onclick="downloadPDF()">Download PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('aboutModal')">&times;</span>
+            <h2 style="color: var(--royal-purple); margin-bottom: 1rem;">About</h2>
+            <p>The Employee Database is a comprehensive system designed to manage employee payroll information. 
+            It allows for new employee registration and verification of existing employees.</p>
+            <p style="margin-top: 1rem;">The system securely stores employee data including ID, name, salary, PF, date of joining, 
+            mobile number, and password.</p>
+        </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('contactModal')">&times;</span>
+            <h2 style="color: var(--royal-purple); margin-bottom: 1rem;">Contact</h2>
+            <p>Developer is Already Cooked by Everywhere and Everyone so if you have any doubt please contact chatgpt </p>
+            <p style="margin-top: 1rem;"><strong>Email:</strong> support@employeedatabase.com</p>
+            <p><strong>Phone:</strong> Developer keeps his data private</p>
+            <p><strong>Address:</strong> Developer From Illuminati</p>
+        </div>
+    </div>
+
+    <!-- Include the html2pdf library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    
+    <script>
+        // Function to show a specific section
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show the requested section
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Function to show modal
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = "block";
+        }
+
+        // Function to close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                event.target.style.display = "none";
+            }
+        }
+
+        // Registration form submission
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const messageDiv = document.getElementById('registrationMessage');
+            
+            // Get form values
+            const empId = document.getElementById('empId').value;
+            const empName = document.getElementById('empName').value;
+            const salary = document.getElementById('salary').value;
+            const pf = document.getElementById('pf').value;
+            const doj = document.getElementById('doj').value;
+            const mobile = document.getElementById('mobile').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Password validation
+            if (password !== confirmPassword) {
+                messageDiv.innerHTML = '<div class="error-message">Passwords do not match!</div>';
+                return;
+            }
+            
+            // Create employee object
+            const employee = {
+                id: empId,
+                Emp_name: empName,
+                salary: salary,
+                PF: pf,
+                DATE_OF_JOINING: doj,
+                MOBILE_NO: mobile,
+                password: password
+            };
+            
+            // Send to backend
+            fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(employee)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    messageDiv.innerHTML = '<div class="success-message">Employee registered successfully!</div>';
+                    document.getElementById('registrationForm').reset();
+                    
+                    // Redirect to home after 2 seconds
+                    setTimeout(() => {
+                        showSection('home');
+                    }, 2000);
+                } else {
+                    messageDiv.innerHTML = `<div class="error-message">${data.message}</div>`;
+                }
+            })
+            .catch(error => {
+                messageDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+            });
+        });
+
+        // Verification form submission
+        document.getElementById('verificationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const messageDiv = document.getElementById('loginMessage');
+            
+            // Get login credentials
+            const loginId = document.getElementById('loginId').value;
+            const loginPassword = document.getElementById('loginPassword').value;
+            
+            // Create login object
+            const loginData = {
+                id: loginId,
+                password: loginPassword
+            };
+            
+            // Send to backend
+            fetch('/api/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(loginData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    messageDiv.innerHTML = '<div class="success-message">Verification successful!</div>';
+                    
+                    // Display employee details
+                    displayEmployeeDetails(data.employee);
+                    
+                    // Navigate to the employee details section
+                    showSection('employeeDetailsSection');
+                } else {
+                    messageDiv.innerHTML = `<div class="error-message">${data.message}</div>`;
+                }
+            })
+            .catch(error => {
+                messageDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+            });
+        });
+
+        // Function to display employee details
+        function displayEmployeeDetails(employee) {
+            const detailsContainer = document.getElementById('employeeDetails');
+            
+            const formattedDate = new Date(employee.DATE_OF_JOINING).toLocaleDateString();
+            
+            let html = `
+                <div class="detail-row">
+                    <div class="detail-label">Employee ID:</div>
+                    <div class="detail-value">${employee.id}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Name:</div>
+                    <div class="detail-value">${employee.Emp_name}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Salary:</div>
+                    <div class="detail-value">₹${employee.salary}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">PF:</div>
+                    <div class="detail-value">₹${employee.PF}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Date of Joining:</div>
+                    <div class="detail-value">${formattedDate}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Mobile Number:</div>
+                    <div class="detail-value">${employee.MOBILE_NO}</div>
+                </div>
+            `;
+            
+            detailsContainer.innerHTML = html;
+        }
+
+        // Function to download employee details as PDF
+        function downloadPDF() {
+            const element = document.getElementById('employeeDetailsSection');
+            const options = {
+                margin: 10,
+                filename: 'employee_details.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // Generate PDF
+            html2pdf().from(element).set(options).save();
+        }
+    </script>
+</body>
+</html>
