@@ -16,7 +16,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public','index.html')));
+app.use(express.static(path.join(__dirname, 'public')));  // Ensure the static files are served correctly
 
 // Routes
 app.get('/', (req, res) => {
@@ -33,16 +33,13 @@ app.post('/api/register', async (req, res) => {
       .from('EMPLOYEE')
       .select('id')
       .eq('id', id)
-      .single();
+      .single();  // Ensuring only a single result is returned
     
     if (existingEmployee) {
-      return res.status(400).json({
-        success: false,
-        message: 'Employee ID already exists'
-      });
+      return res.status(400).json({ success: false, message: 'Employee ID already exists.' });
     }
-    
-    // Insert new employee into the database
+
+    // Insert new employee into database
     const { data, error } = await supabase
       .from('EMPLOYEE')
       .insert([
@@ -58,25 +55,14 @@ app.post('/api/register', async (req, res) => {
       ]);
     
     if (error) {
-      console.error('Database error:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Error registering employee',
-        error: error.message
-      });
+      return res.status(500).json({ success: false, message: 'Failed to register employee.', error: error.message });
     }
-    
-    return res.status(201).json({
-      success: true,
-      message: 'Employee registered successfully'
-    });
+
+    // Successful registration
+    return res.status(200).json({ success: true, message: 'Employee registered successfully!', data: data });
   } catch (error) {
-    console.error('Server error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Server error',
-      error: error.message
-    });
+    console.error('Error during registration:', error);
+    return res.status(500).json({ success: false, message: 'An unexpected error occurred during registration.', error: error.message });
   }
 });
 
@@ -84,46 +70,31 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/verify', async (req, res) => {
   try {
     const { id, password } = req.body;
-    
-    // Find employee by ID
+
+    // Check if employee exists
     const { data: employee, error } = await supabase
       .from('EMPLOYEE')
       .select('*')
       .eq('id', id)
-      .single();
+      .eq('password', password)
+      .single();  // Ensuring single result
     
     if (error || !employee) {
-      return res.status(404).json({
-        success: false,
-        message: 'Employee not found'
-      });
+      return res.status(401).json({ success: false, message: 'Invalid credentials or employee not found.' });
     }
-    
-    // Verify password
-    if (employee.password !== password) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid password'
-      });
-    }
-    
-    // Return employee details
-    return res.status(200).json({
-      success: true,
-      message: 'Employee verified successfully',
-      employee
-    });
+
+    // Successful verification
+    return res.status(200).json({ success: true, message: 'Verification successful!', employee: employee });
   } catch (error) {
-    console.error('Server error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Server error',
-      error: error.message
-    });
+    console.error('Error during verification:', error);
+    return res.status(500).json({ success: false, message: 'An unexpected error occurred during verification.', error: error.message });
   }
 });
 
-// Start server
+// Serve static files (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
