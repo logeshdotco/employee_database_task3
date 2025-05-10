@@ -410,121 +410,120 @@
                 event.target.style.display = "none";
             }
         }
+// Registration form submission
+document.getElementById('registrationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const messageDiv = document.getElementById('registrationMessage');
+    messageDiv.innerHTML = '<div class="success-message">Processing...</div>';
+    
+    // Get form values
+    const empId = document.getElementById('empId').value;
+    const empName = document.getElementById('empName').value;
+    const salary = document.getElementById('salary').value;
+    const pf = document.getElementById('pf').value;
+    const doj = document.getElementById('doj').value;
+    const mobile = document.getElementById('mobile').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    // Password validation
+    if (password !== confirmPassword) {
+        messageDiv.innerHTML = '<div class="error-message">Passwords do not match!</div>';
+        return;
+    }
+    
+    // Create employee object
+    const employee = {
+        id: empId,
+        Emp_name: empName,
+        salary: salary,
+        PF: pf,
+        DATE_OF_JOINING: doj,
+        MOBILE_NO: mobile,
+        password: password
+    };
+    
+    // Send to backend
+    fetch('/api/register', {  // FIXED: Correct endpoint
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',  // FIXED: Correct content type
+        },
+        body: JSON.stringify(employee)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server responded with status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            messageDiv.innerHTML = '<div class="success-message">Employee registered successfully!</div>';
+            document.getElementById('registrationForm').reset();
+            
+            // Redirect to home after 2 seconds
+            setTimeout(() => {
+                showSection('home');
+            }, 2000);
+        } else {
+            messageDiv.innerHTML = `<div class="error-message">${data.message || 'Registration failed'}</div>`;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        messageDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+    });
+});
 
-        // Registration form submission
-        document.getElementById('registrationForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const messageDiv = document.getElementById('registrationMessage');
-            messageDiv.innerHTML = '<div class="success-message">Processing...</div>';
+// Verification form submission
+document.getElementById('verificationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const messageDiv = document.getElementById('loginMessage');
+    messageDiv.innerHTML = '<div class="success-message">Verifying...</div>';
+    
+    // Get login credentials
+    const loginId = document.getElementById('loginId').value;
+    const loginPassword = document.getElementById('loginPassword').value;
+    
+    // Create login object
+    const loginData = {
+        id: loginId,
+        password: loginPassword
+    };
+    
+    // Send to backend
+    fetch('/api/verify', {  // FIXED: Correct endpoint
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',  // FIXED: Correct content type
+        },
+        body: JSON.stringify(loginData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server responded with status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            messageDiv.innerHTML = '<div class="success-message">Verification successful!</div>';
             
-            // Get form values
-            const empId = document.getElementById('empId').value;
-            const empName = document.getElementById('empName').value;
-            const salary = document.getElementById('salary').value;
-            const pf = document.getElementById('pf').value;
-            const doj = document.getElementById('doj').value;
-            const mobile = document.getElementById('mobile').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+            // Display employee details
+            displayEmployeeDetails(data.employee);
             
-            // Password validation
-            if (password !== confirmPassword) {
-                messageDiv.innerHTML = '<div class="error-message">Passwords do not match!</div>';
-                return;
-            }
-            
-            // Create employee object
-            const employee = {
-                id: empId,
-                Emp_name: empName,
-                salary: salary,
-                PF: pf,
-                DATE_OF_JOINING: doj,
-                MOBILE_NO: mobile,
-                password: password
-            };
-            
-            // Send to backend
-            fetch('/script', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'package/json',
-                },
-                body: JSON.stringify(employee)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Server responded with status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    messageDiv.innerHTML = '<div class="success-message">Employee registered successfully!</div>';
-                    document.getElementById('registrationForm').reset();
-                    
-                    // Redirect to home after 2 seconds
-                    setTimeout(() => {
-                        showSection('home');
-                    }, 2000);
-                } else {
-                    messageDiv.innerHTML = `<div class="error-message">${data.message || 'Registration failed'}</div>`;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                messageDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
-            });
-        });
-
-        // Verification form submission
-        document.getElementById('verificationForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const messageDiv = document.getElementById('loginMessage');
-            messageDiv.innerHTML = '<div class="success-message">Verifying...</div>';
-            
-            // Get login credentials
-            const loginId = document.getElementById('loginId').value;
-            const loginPassword = document.getElementById('loginPassword').value;
-            
-            // Create login object
-            const loginData = {
-                id: loginId,
-                password: loginPassword
-            };
-            
-            // Send to backend
-            fetch('/script', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'package/json',
-                },
-                body: JSON.stringify(loginData)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Server responded with status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    messageDiv.innerHTML = '<div class="success-message">Verification successful!</div>';
-                    
-                    // Display employee details
-                    displayEmployeeDetails(data.employee);
-                    
-                    // Navigate to the employee details section
-                    showSection('employeeDetailsSection');
-                } else {
-                    messageDiv.innerHTML = `<div class="error-message">${data.message || 'Verification failed'}</div>`;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                messageDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
-            });
-        });
+            // Navigate to the employee details section
+            showSection('employeeDetailsSection');
+        } else {
+            messageDiv.innerHTML = `<div class="error-message">${data.message || 'Verification failed'}</div>`;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        messageDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+    });
+});
 
         // Function to display employee details
         function displayEmployeeDetails(employee) {
