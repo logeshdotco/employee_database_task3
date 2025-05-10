@@ -281,15 +281,15 @@
                 <form id="registrationForm">
                     <div class="form-group">
                         <label for="empId">Employee ID</label>
-                        <input type="text" placeholder="Enter Employee ID"class="form-control" id="empId" required>
+                        <input type="text" placeholder="Enter Employee ID" class="form-control" id="empId" required>
                     </div>
                     <div class="form-group">
                         <label for="empName">Employee Name</label>
-                        <input type="text"placeholder="Enter Employee Name" class="form-control" id="empName" required>
+                        <input type="text" placeholder="Enter Employee Name" class="form-control" id="empName" required>
                     </div>
                     <div class="form-group">
                         <label for="salary">Salary</label>
-                        <input type="number" placeholder="Enter Employee's correct salary(don't play with employees life)" class="form-control" id="salary" required>
+                        <input type="number" placeholder="Enter Employee's correct salary" class="form-control" id="salary" required>
                     </div>
                     <div class="form-group">
                         <label for="pf">PF</label>
@@ -297,11 +297,11 @@
                     </div>
                     <div class="form-group">
                         <label for="doj">Date of Joining</label>
-                        <input type="date"placeholder="Enter Date of join when the employee joins" class="form-control" id="doj" required>
+                        <input type="date" placeholder="Enter Date of join" class="form-control" id="doj" required>
                     </div>
                     <div class="form-group">
                         <label for="mobile">Mobile Number</label>
-                        <input type="tel"placeholder="Enter Employee's Contact number" class="form-control" id="mobile" required>
+                        <input type="tel" placeholder="Enter Employee's Contact number" class="form-control" id="mobile" required>
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
@@ -327,11 +327,11 @@
                 <form id="verificationForm">
                     <div class="form-group">
                         <label for="loginId">Employee ID</label>
-                        <input type="text" placeholder="Enter Employee ID"class="form-control" id="loginId" required>
+                        <input type="text" placeholder="Enter Employee ID" class="form-control" id="loginId" required>
                     </div>
                     <div class="form-group">
                         <label for="loginPassword">Password</label>
-                        <input type="password" placeholder="Enter password"class="form-control" id="loginPassword" required>
+                        <input type="password" placeholder="Enter password" class="form-control" id="loginPassword" required>
                     </div>
                     <div id="loginMessage"></div>
                     <div class="buttons-container">
@@ -415,6 +415,7 @@
         document.getElementById('registrationForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const messageDiv = document.getElementById('registrationMessage');
+            messageDiv.innerHTML = '<div class="success-message">Processing...</div>';
             
             // Get form values
             const empId = document.getElementById('empId').value;
@@ -451,7 +452,12 @@
                 },
                 body: JSON.stringify(employee)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server responded with status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     messageDiv.innerHTML = '<div class="success-message">Employee registered successfully!</div>';
@@ -462,10 +468,11 @@
                         showSection('home');
                     }, 2000);
                 } else {
-                    messageDiv.innerHTML = `<div class="error-message">${data.message}</div>`;
+                    messageDiv.innerHTML = `<div class="error-message">${data.message || 'Registration failed'}</div>`;
                 }
             })
             .catch(error => {
+                console.error('Error:', error);
                 messageDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
             });
         });
@@ -474,6 +481,7 @@
         document.getElementById('verificationForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const messageDiv = document.getElementById('loginMessage');
+            messageDiv.innerHTML = '<div class="success-message">Verifying...</div>';
             
             // Get login credentials
             const loginId = document.getElementById('loginId').value;
@@ -493,7 +501,12 @@
                 },
                 body: JSON.stringify(loginData)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server responded with status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     messageDiv.innerHTML = '<div class="success-message">Verification successful!</div>';
@@ -504,10 +517,11 @@
                     // Navigate to the employee details section
                     showSection('employeeDetailsSection');
                 } else {
-                    messageDiv.innerHTML = `<div class="error-message">${data.message}</div>`;
+                    messageDiv.innerHTML = `<div class="error-message">${data.message || 'Verification failed'}</div>`;
                 }
             })
             .catch(error => {
+                console.error('Error:', error);
                 messageDiv.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
             });
         });
@@ -516,24 +530,33 @@
         function displayEmployeeDetails(employee) {
             const detailsContainer = document.getElementById('employeeDetails');
             
-            const formattedDate = new Date(employee.DATE_OF_JOINING).toLocaleDateString();
+            // Format date if available
+            let formattedDate = "Not specified";
+            if (employee.DATE_OF_JOINING) {
+                try {
+                    formattedDate = new Date(employee.DATE_OF_JOINING).toLocaleDateString();
+                } catch (e) {
+                    console.error("Date formatting error:", e);
+                    formattedDate = employee.DATE_OF_JOINING;
+                }
+            }
             
             let html = `
                 <div class="detail-row">
                     <div class="detail-label">Employee ID:</div>
-                    <div class="detail-value">${employee.id}</div>
+                    <div class="detail-value">${employee.id || 'N/A'}</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Name:</div>
-                    <div class="detail-value">${employee.Emp_name}</div>
+                    <div class="detail-value">${employee.Emp_name || 'N/A'}</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Salary:</div>
-                    <div class="detail-value">₹${employee.salary}</div>
+                    <div class="detail-value">₹${employee.salary || 'N/A'}</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">PF:</div>
-                    <div class="detail-value">₹${employee.PF}</div>
+                    <div class="detail-value">₹${employee.PF || 'N/A'}</div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Date of Joining:</div>
@@ -541,7 +564,7 @@
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Mobile Number:</div>
-                    <div class="detail-value">${employee.MOBILE_NO}</div>
+                    <div class="detail-value">${employee.MOBILE_NO || 'N/A'}</div>
                 </div>
             `;
             
